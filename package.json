@@ -1,0 +1,18 @@
+{
+  "name": "RxEcho",
+  "version": "1.0.0",
+  "description": "HackRU F16",
+  "repository": {
+    "url": "https://github.com/kbohinski/HackRU-F16",
+    "type": "git"
+  },
+  "bugs": {
+    "url": "https://github.com/kbohinski/HackRU-F16/issues"
+  },
+  "scripts": {
+    "start": "node app.js"
+  },
+  "main": "app.js",
+  "dependencies": {
+  }
+}
