@@ -1,0 +1,101 @@
+DrugInfoIntent  {DrugName}
+DrugInfoIntent  {DrugName} information
+DrugInfoIntent  {DrugName} info
+DrugInfoIntent  tell me about {DrugName}
+DrugInfoIntent  what is {DrugName}
+DrugInfoIntent  what's {DrugName}
+DrugUsageIntent  usage of {DrugName}
+DrugUsageIntent  usage for {DrugName}
+DrugUsageIntent  usage information of {DrugName}
+DrugUsageIntent  usage information for {DrugName}
+DrugUsageIntent  tell me the usage information of {DrugName}
+DrugUsageIntent  tell me the usage information for {DrugName}
+DrugUsageIntent  what is the usage information of {DrugName}
+DrugUsageIntent  what is the usage information for {DrugName}
+DrugUsageIntent  tell me when to take {DrugName}
+DrugUsageIntent  tell me when i should take {DrugName}
+DrugUsageIntent  when do i take {DrugName}
+DrugUsageIntent  when should i take {DrugName}
+DrugUsageIntent  dosage of {DrugName}
+DrugUsageIntent  dosage for {DrugName}
+DrugUsageIntent  dosage information of {DrugName}
+DrugUsageIntent  dosage information for {DrugName}
+DrugUsageIntent  dosage info of {DrugName}
+DrugUsageIntent  dosage info for {DrugName}
+DrugUsageIntent  what is the dosage of {DrugName}
+DrugUsageIntent  what is the dosage for {DrugName}
+DrugUsageIntent  what is the dosage information of {DrugName}
+DrugUsageIntent  what is the dosage information for {DrugName}
+DrugUsageIntent  what is the dosage info of {DrugName}
+DrugUsageIntent  what is the dosage info for {DrugName}
+DrugUsageIntent  what is the correct dosage of {DrugName}
+DrugUsageIntent  what is the correct dosage for {DrugName}
+DrugUsageIntent  what is the proper dosage of {DrugName}
+DrugUsageIntent  what is the proper dosage for {DrugName}
+DrugUsageIntent  what are the dosages of {DrugName}
+DrugUsageIntent  what are the dosages for {DrugName}
+DrugManufacturerIntent  manufacturer of {DrugName}
+DrugManufacturerIntent  manufacturer for {DrugName}
+DrugManufacturerIntent  what is the manufacturer of {DrugName}
+DrugManufacturerIntent  what is the manufacturer for {DrugName}
+DrugManufacturerIntent  who is the manufacturer of {DrugName}
+DrugManufacturerIntent  who is the manufacturer for {DrugName}
+DrugManufacturerIntent  who makes {DrugName}
+DrugManufacturerIntent  who is the maker of {DrugName}
+DrugManufacturerIntent  who is the maker for {DrugName}
+DrugManufacturerIntent  who is the producer of {DrugName}
+DrugManufacturerIntent  who is the producer for {DrugName}
+DrugSideEffectsIntent  {DrugName} side effects
+DrugSideEffectsIntent  tell me {DrugName} side effects
+DrugSideEffectsIntent  what are {DrugName} side effects
+DrugSideEffectsIntent  side effects of {DrugName}
+DrugSideEffectsIntent  side effects for {DrugName}
+DrugSideEffectsIntent  tell me the side effects of {DrugName}
+DrugSideEffectsIntent  tell me the side effects for {DrugName}
+DrugSideEffectsIntent  what are the side effects of {DrugName}
+DrugSideEffectsIntent  what are the side effects for {DrugName}
+DrugSideEffectsIntent  list the side effects of {DrugName}
+DrugSideEffectsIntent  list the side effects for {DrugName}
+DrugSideEffectsIntent  are there any side effects of {DrugName}
+DrugSideEffectsIntent  are there any side effects for {DrugName}
+DrugActiveIngredientsIntent  {DrugName} active ingredients
+DrugActiveIngredientsIntent  tell me {DrugName} active ingredients
+DrugActiveIngredientsIntent  what are {DrugName} active ingredients
+DrugActiveIngredientsIntent  tell me the active ingredients of {DrugName}
+DrugActiveIngredientsIntent  tell me the active ingredients for {DrugName}
+DrugActiveIngredientsIntent  what are the active ingredients of {DrugName}
+DrugActiveIngredientsIntent  what are the active ingredients for {DrugName}
+DrugActiveIngredientsIntent  list the active ingredients of {DrugName}
+DrugActiveIngredientsIntent  list the active ingredients for {DrugName}
+DrugInactiveIngredientsIntent  {DrugName} inactive ingredients
+DrugInactiveIngredientsIntent  tell me {DrugName} inactive ingredients
+DrugInactiveIngredientsIntent  what are {DrugName} inactive ingredients
+DrugInactiveIngredientsIntent  tell me the inactive ingredients of {DrugName}
+DrugInactiveIngredientsIntent  tell me the inactive ingredients for {DrugName}
+DrugInactiveIngredientsIntent  what are the inactive ingredients of {DrugName}
+DrugInactiveIngredientsIntent  what are the inactive ingredients for {DrugName}
+DrugInactiveIngredientsIntent  list the inactive ingredients of {DrugName}
+DrugInactiveIngredientsIntent  list the inactive ingredients for {DrugName}
+DrugConflictsIntent  {DrugName} conflicts
+DrugConflictsIntent  conflicts of {DrugName}
+DrugConflictsIntent  conflicts for {DrugName}
+DrugConflictsIntent  conflicts with {DrugName}
+DrugConflictsIntent  are there any conflicts of {DrugName}
+DrugConflictsIntent  are there any conflicts for {DrugName}
+DrugConflictsIntent  are there any conflicts with {DrugName}
+DrugConflictsIntent  which drugs conflict with {DrugName}
+DrugConflictsIntent  which medicines conflict with {DrugName}
+DrugConflictsIntent  which perscriptions conflict with {DrugName}
+DrugQuestionsIntent  {DrugName} questions
+DrugQuestionsIntent  questions with {DrugName}
+DrugQuestionsIntent  questions about {DrugName}
+DrugQuestionsIntent  questions regarding {DrugName}
+DrugQuestionsIntent  who can I call for questions with {DrugName}
+DrugQuestionsIntent  who can I call for questions about {DrugName}
+DrugQuestionsIntent  who can I call for questions regarding {DrugName}
+DrugQuestionsIntent  where can I call for questions with {DrugName}
+DrugQuestionsIntent  where can I call for questions about {DrugName}
+DrugQuestionsIntent  where can I call for questions regarding {DrugName}
+DrugQuestionsIntent  i want to know more about {DrugName}
+DrugQuestionsIntent  tell me more about {DrugName}
+DrugQuestionsIntent  what is the number for {DrugName}

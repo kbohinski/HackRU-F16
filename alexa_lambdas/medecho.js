@@ -1,11 +1,13 @@
 'use strict';
 
-// --------------- OpenFDA functions -----------------------
+// --------------- OpenFDA includes -----------------------
 
 var https = require('https');
 
 var BASE_URL_LABEL = 'https://api.fda.gov/drug/label.json';
 var BASE_URL_EVENT = 'https://api.fda.gov/drug/event.json';
+
+// --------------- OpenFDA functions -----------------------
 
 var drug_intent_map = {
     'DrugInfoIntent': ['purpose', 'indications_and_usage'],
@@ -15,7 +17,7 @@ var drug_intent_map = {
     'DrugActiveIngredientsIntent': ['active_ingredient'],
     'DrugInactiveIngredientsIntent': ['inactive_ingredient'],
     'DrugConflictsIntent': ['do_not_use'],
-    'DrugQuestionsIntent': ['questions'],
+    'DrugQuestionsIntent': ['questions']
 }
 
 function httpRequest(url, callback) {
@@ -75,7 +77,7 @@ function getWelcomeResponse(callback) {
     // If we wanted to initialize the session to have some attributes we could add those here.
     const sessionAttributes = {};
     const cardTitle = 'Welcome';
-    const speechOutput = 'Welcome to Medecho. ' /*+
+    const speechOutput = 'Welcome to Med-Echo. ' /*+
         'I can answer any questions you may have regarding medication usage and safety information. ' + 
         'I can also set daily reminders for your perscriptions.'*/;
     // If the user either does not reply to the welcome message or says something that is not
@@ -89,7 +91,7 @@ function getWelcomeResponse(callback) {
 
 function handleSessionEndRequest(callback) {
     const cardTitle = 'Session Ended';
-    const speechOutput = 'Thank you for trying RxEcho. Have a nice day!';
+    const speechOutput = 'Thank you for trying Med-Echo. Have a nice day!';
     // Setting this to true ends the session and exits the skill.
     const shouldEndSession = true;
 
@@ -113,10 +115,11 @@ function getDrugInfo(intent, session, callback) {
             speechOutput = drugName + ' ';
             speechOutput = repromptText = 'Please specify a perscription for me to find info about.';
         } else {
-            const results = flattenOpenFda(infoJson.body.results[0]), keys = drug_intent_map[intent.name];
-            if (keys && keys.length) {
+            const results = flattenOpenFda(infoJson.body.results[0]), keys = drug_intent_map[intent.name],
+                truthy_keys = keys ? keys.filter(key => key) : [];
+            if (truthy_keys.length) {
                 speechOutput = drugName + ": ";
-                keys.forEach(key => speechOutput += (results[key] ? results[key] : '') + '. ');
+                truthy_keys.forEach(key => speechOutput += (results[key] ? results[key] : '') + '. ');
             } else {
                 speechOutput = repromptText = 'I wasn\'t able to find any information about that on record.';
             }
