@@ -64,7 +64,7 @@ function getWelcomeResponse(callback) {
     // If we wanted to initialize the session to have some attributes we could add those here.
     const sessionAttributes = {};
     const cardTitle = 'Welcome';
-    const speechOutput = 'Welcome to RxEcho. ' +
+    const speechOutput = 'Welcome to Medecho. ' +
         'I can answer any questions you may have regarding medication usage and safety information. ' + 
         'I can also set daily reminders for your perscriptions.';
     // If the user either does not reply to the welcome message or says something that is not
@@ -85,48 +85,48 @@ function handleSessionEndRequest(callback) {
     callback({}, buildSpeechletResponse(cardTitle, speechOutput, null, shouldEndSession));
 }
 
-function getDrugInfo(intent, session, callback) {
-    const drugName = intent.slots.DrugName.value;
-    let speechOutput, repromptText;
+function flattenOpenFda(json) {
+    for (var key in json['openfda']) {
+        if (json.hasOwnProperty(key))
+            json[key] = json['openfda'][key];
+    }
+    return json;
+}
 
-    // If no information type is specified, provide general info
-    let infoType = intent.slots.InfoType.value;
-    if (!infoType)
-        infoType = 'GENERAL';
+function getDrugInfo(intent, session, callback) {
+    const drugName = intent.slots.DrugName ? intent.slots.DrugName.value : null,
+        infoType = intent.slots.InfoType ? intent.slots.InfoType.value : 'GENERAL';
+    let speechOutput, repromptText;
 
     getDrugLabel(drugName, infoType, infoJson => {
         if (!drugName || infoJson.status === 'failure') {
             repromptText = 'Please specify a perscription for me to find info about.';
         } else {
-            const results = infoJson.body.results[0];
             speechOutput = drugName + ": ";
-            switch (infoType) {
-            case 'GENERAL':
-                speechOutput += results.purpose + ". " + results.indications_and_usage;
-                break;
-            case 'PERSCRIPTION_REQUIRED':
-                speechOutput = 'No perscription required.';
-                break;
-            case 'USAGE_INSTRUCTIONS':
-                speechOutput = 'Sample usage instructions.';
-                break;
-            case 'MANUFACTURER':
-                speechOutput = 'Samle manufacturer.';
-                break;
-            case 'SIDE_EFFECTS':
-                speechOutput = 'Sample side effects.';
-                break;
-            case 'ACTIVE_INGREDIENTS':
-                speechOutput = 'Sample active ingredients.';
-                break;
-            case 'INACTIVE_INGREDIENTS':
-                speechOutput = 'Sample inactive ingredients.';
-                break;
-            default:
-                speechOutput = null;
+            const results = flattenOpenFda(infoJson.body.results[0]), keys = (() => {
+                switch (infoType) {
+                case 'GENERAL':
+                    return ['purpose', 'indications_and_usage'];
+                case 'USAGE_INSTRUCTIONS':
+                    return ['dosage_and_administration'];
+                case 'MANUFACTURER':
+                    return ['manufacturer_name'];
+                case 'SIDE_EFFECTS':
+                    return ['stop_use'];
+                case 'ACTIVE_INGREDIENTS':
+                    return ['active_ingredient'];
+                case 'INACTIVE_INGREDIENTS':
+                    return ['inactive_ingredient'];
+                case 'CONFLICTS':
+                    return ['do_not_use'];
+                default:
+                    return [];
+                }
+            })();
+            if (keys.length)
+                keys.forEach(key => speechOutput += results[key] + '. ');
+            else
                 repromptText = 'I wasn\'t able to find any information about that on record.';
-                break;
-            }
         }
         callback({}, buildSpeechletResponse(intent.name, speechOutput, repromptText, false));
     });
