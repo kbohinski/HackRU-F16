@@ -11,28 +11,32 @@ var AUTH = {
         "number": "+18569246200"
     }
 };
+var PHONE_NUMBER = '***REMOVED***';
 
 // --------------- Twilio functions -----------------------
 
 function sendMessage(to, msg) {
     var opts = {
-        'hostname': 'https://api.twilio.com/2010-04-01/Accounts/' + AUTH.twilio.key + '/Messages.json',
+        'hostname': 'api.twilio.com',
         'port': 443,
+        'path': '/2010-04-01/Accounts/' + AUTH.twilio.key + '/Messages.json',
         'method': 'GET'
     };
 
     var headers = {
         'To': PHONE_NUMBER,
-	'From': AUTH.twilio.number,
-	'Body': msg
+    	'From': AUTH.twilio['number'],
+	    'Body': msg
     };
 
     var auth = {
-        'user:password': AUTH.twilio.key + ':' + AUTH.twilio.secret;
+        'user:password': AUTH.twilio.key + ':' + AUTH.twilio.secret
     };
 
     opts.auth = auth;
     opts.headers = headers;
+
+    console.log(JSON.stringify(opts));
 
     var req = https.request(opts, res => {
         
@@ -44,7 +48,6 @@ function sendMessage(to, msg) {
 
 var BASE_URL_LABEL = 'https://api.fda.gov/drug/label.json';
 var BASE_URL_EVENT = 'https://api.fda.gov/drug/event.json';
-var PHONE_NUMBER = '***REMOVED***';
 
 // --------------- OpenFDA functions -----------------------
 
