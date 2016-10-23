@@ -1,5 +1,28 @@
 'use strict';
 
+// --------------- OpenFDA functions -----------------------
+
+var http = require('http');
+
+var BASE_URL_LABEL = 'http://api.fda.gov/drug/label.json';
+var BASE_URL_EVENT = 'http://api.fda.gov/drug/event.json';
+
+function xhrRequest(url, callback) {
+    http.get(url, res => {
+        callback({'status': 'success', 'body': res.body});
+    }).on('error', e => {
+        callback({'status': 'failure', 'error': e});
+    });
+}
+
+function getDrugLabel(drugName, infoType, callback) {
+    return xhrRequest(BASE_URL_LABEL + '?search=' + drugName, callback);
+}
+
+function getDrugEvent(drug, callback) {
+    return xhrRequest(BASE_URL_EVENT + '?search=' + drug, callback);
+}
+  
 // --------------- Helpers that build all of the responses -----------------------
 
 function buildSpeechletResponse(title, output, repromptText, shouldEndSession) {
@@ -62,37 +85,48 @@ function handleSessionEndRequest(callback) {
 
 
 function getDrugInfo(intent, session, callback) {
+    const drugName = intent.slots.DrugName;
     let speechOutput, repromptText;
+    // If no information type is specified, provide general info
+    let infoType = intent.slots.InfoType.value;
+    if (!infoType)
+        infoType = 'GENERAL';
 
-    switch (intent.slots.InfoType.value) {
-    case 'GENERAL':
-        speechOutput = 'Sample general drug info.';
-        break;
-    case 'PERSCRIPTION_REQUIRED':
-        speechOutput = 'No perscription required.';
-        break;
-    case 'USAGE_INSTRUCTIONS':
-        speechOutput = 'Sample usage instructions.';
-        break;
-    case 'MANUFACTURER':
-        speechOutput = 'Samle manufacturer.';
-        break;
-    case 'SIDE_EFFECTS':
-        speechOutput = 'Sample side effects.';
-        break;
-    case 'ACTIVE_INGREDIENTS':
-        speechOutput = 'Sample active ingredients.';
-        break;
-    case 'INACTIVE_INGREDIENTS':
-        speechOutput = 'Sample inactive ingredients.';
-        break;
-    default:
-        speechOutput = null;
-        speechOutput = 'I wasn\'t able to find any information about that on record.';
-        repromptText = 'I wasn\'t able to find any information about that on record.';
-        break;
-    }
-    callback({}, buildSpeechletResponse(intent.name, speechOutput, repromptText, false));
+    getDrugLabel(drugName, infoType, infoJson => {
+        if (!drugName || infoJson.status === 'failure') {
+            repromptText = 'Please specify a perscription for me to find info about.';
+        } else {
+            switch (intent.slots.InfoType.value) {
+            case 'GENERAL':
+                speechOutput = 'General perscription information.';
+                break;
+            case 'PERSCRIPTION_REQUIRED':
+                speechOutput = 'No perscription required.';
+                break;
+            case 'USAGE_INSTRUCTIONS':
+                speechOutput = 'Sample usage instructions.';
+                break;
+            case 'MANUFACTURER':
+                speechOutput = 'Samle manufacturer.';
+                break;
+            case 'SIDE_EFFECTS':
+                speechOutput = 'Sample side effects.';
+                break;
+            case 'ACTIVE_INGREDIENTS':
+                speechOutput = 'Sample active ingredients.';
+                break;
+            case 'INACTIVE_INGREDIENTS':
+                speechOutput = 'Sample inactive ingredients.';
+                break;
+            default:
+                speechOutput = null;
+                repromptText = 'I wasn\'t able to find any information about that on record.';
+                break;
+            }
+            speechOutput = infoJson.body;
+        }
+        callback({}, buildSpeechletResponse(intent.name, speechOutput, repromptText, false));
+    });
 }
 
 
