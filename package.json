@@ -14,5 +14,6 @@
   },
   "main": "medecho.js",
   "dependencies": {
+    "unirest": "^0.5.1"
   }
 }

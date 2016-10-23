@@ -1,6 +1,7 @@
 'use strict';
 
 var https = require('https');
+var unirest = require('unirest');
 
 // --------------- Twilio  includes -----------------------
 
@@ -16,32 +17,18 @@ var PHONE_NUMBER = '***REMOVED***';
 // --------------- Twilio functions -----------------------
 
 function sendMessage(to, msg) {
-    var opts = {
-        'hostname': 'api.twilio.com',
-        'port': 443,
-        'path': '/2010-04-01/Accounts/' + AUTH.twilio.key + '/Messages.json',
-        'method': 'GET'
-    };
-
     var headers = {
         'To': PHONE_NUMBER,
     	'From': AUTH.twilio['number'],
 	    'Body': msg
     };
 
-    var auth = {
-        'user:password': AUTH.twilio.key + ':' + AUTH.twilio.secret
-    };
+    var url = 'https://api.twilio.com/2010-04-01/Accounts/' + AUTH.twilio.key + '/Messages.json';
 
-    opts.auth = auth;
-    opts.headers = headers;
-
-    console.log(JSON.stringify(opts));
-
-    var req = https.request(opts, res => {
-        
-    });
-    req.end();
+    unirest.post(url)
+        .send(headers)
+        .auth(AUTH.twilio.key, AUTH.twilio.secret, true)
+        .end(function (res) { console.log(res.body) });
 };
 
 // --------------- OpenFDA includes -----------------------
@@ -225,6 +212,9 @@ function onIntent(intentRequest, session, callback) {
             break;
         case 'SetReminderIntent':
             setReminder(intent, session, callback);
+            break;
+        case 'ThankYouIntent':
+            callback({}, buildSpeechletResponse(intentName, 'No problem!', null, true));
             break;
         case 'AMAZON.HelpIntent':
             getWelcomeResponse(callback);
