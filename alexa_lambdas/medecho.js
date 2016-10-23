@@ -85,8 +85,6 @@ function handleSessionEndRequest(callback) {
     callback({}, buildSpeechletResponse(cardTitle, speechOutput, null, shouldEndSession));
 }
 
-
-
 function getDrugInfo(intent, session, callback) {
     const drugName = intent.slots.DrugName.value;
     let speechOutput, repromptText;
