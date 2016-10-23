@@ -9,10 +9,10 @@ var BASE_URL_EVENT = 'https://api.fda.gov/drug/event.json';
 
 function httpRequest(url, callback) {
     https.get(url, res => {
-        var body = '';
         res.setEncoding('utf8');
+        let body = '';
         res.on('data', chunk => body += chunk);
-        callback({'status': 'success', 'body': body});
+        res.on('end', () => callback({'status': 'success', 'body': JSON.parse(body)}));
     }).on('error', e => {
         callback({'status': 'failure', 'error': e});
     });
@@ -88,8 +88,9 @@ function handleSessionEndRequest(callback) {
 
 
 function getDrugInfo(intent, session, callback) {
-    const drugName = intent.slots.DrugName;
+    const drugName = intent.slots.DrugName.value;
     let speechOutput, repromptText;
+
     // If no information type is specified, provide general info
     let infoType = intent.slots.InfoType.value;
     if (!infoType)
@@ -99,10 +100,11 @@ function getDrugInfo(intent, session, callback) {
         if (!drugName || infoJson.status === 'failure') {
             repromptText = 'Please specify a perscription for me to find info about.';
         } else {
+            const results = infoJson.body.results[0];
             speechOutput = drugName + ": ";
-            switch (intent.slots.InfoType.value) {
+            switch (infoType) {
             case 'GENERAL':
-                speechOutput += infoJson.purpose + ". " + infoJson.indications_and_usage;
+                speechOutput += results.purpose + ". " + results.indications_and_usage;
                 break;
             case 'PERSCRIPTION_REQUIRED':
                 speechOutput = 'No perscription required.';
