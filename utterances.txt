@@ -99,3 +99,21 @@ DrugQuestionsIntent  where can I call for questions regarding {DrugName}
 DrugQuestionsIntent  i want to know more about {DrugName}
 DrugQuestionsIntent  tell me more about {DrugName}
 DrugQuestionsIntent  what is the number for {DrugName}
+SetReminderIntent  reminder for {DrugName}
+SetReminderIntent  reminder for my {DrugName}
+SetReminderIntent  reminder for my {DrugName} perscription
+SetReminderIntent  add reminder for {DrugName}
+SetReminderIntent  add reminder for my {DrugName}
+SetReminderIntent  add reminder for my {DrugName} perscription
+SetReminderIntent  set reminder for {DrugName}
+SetReminderIntent  set reminder for my {DrugName}
+SetReminderIntent  set reminder for my {DrugName} perscription
+SetReminderIntent  remind me to take {DrugName}
+SetReminderIntent  remind me to take my {DrugName}
+SetReminderIntent  remind me to take my {DrugName} perscription
+SetReminderIntent  to remind me to take {DrugName}
+SetReminderIntent  to remind me to take my {DrugName}
+SetReminderIntent  to remind me to take my {DrugName} perscription
+ThankYouIntent  thank you
+ThankYouIntent  thank you alexa
+ThankYouIntent  thanks

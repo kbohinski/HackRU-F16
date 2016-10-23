@@ -28,7 +28,7 @@ function sendMessage(to, msg) {
     unirest.post(url)
         .send(headers)
         .auth(AUTH.twilio.key, AUTH.twilio.secret, true)
-        .end(function (res) { console.log(res.body) });
+        .end(function (res) {});
 };
 
 // --------------- OpenFDA includes -----------------------
@@ -128,10 +128,8 @@ function handleSessionEndRequest(callback) {
 }
 
 function flattenOpenFda(json) {
-    for (var key in json['openfda']) {
-        if (json.hasOwnProperty(key))
-            json[key] = json['openfda'][key];
-    }
+    for (var key in json['openfda'])
+        json[key] = json['openfda'][key];
     return json;
 }
 
@@ -144,8 +142,9 @@ function getDrugInfo(intent, session, callback) {
             speechOutput = drugName + ' ';
             speechOutput = repromptText = 'Please specify a perscription for me to find info about.';
         } else {
-            const results = flattenOpenFda(infoJson.body.results[0]), keys = drug_intent_map[intent.name],
+			const results = flattenOpenFda(infoJson.body.results[0]), keys = drug_intent_map[intent.name],
                 truthy_keys = keys ? keys.filter(key => results[key]) : [];
+
             if (truthy_keys.length) {
                 speechOutput = drugName + ": ";
                 truthy_keys.forEach(key => speechOutput += (results[key] ? results[key] : '') + '. ');

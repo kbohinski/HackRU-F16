@@ -1,2 +1,3 @@
 node_modules/
 Twilio/TwilioCreds.json
+*.zip
