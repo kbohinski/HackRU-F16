@@ -6,6 +6,7 @@ var https = require('https');
 
 var BASE_URL_LABEL = 'https://api.fda.gov/drug/label.json';
 var BASE_URL_EVENT = 'https://api.fda.gov/drug/event.json';
+var PHONE_NUMBER = '';
 
 // --------------- OpenFDA functions -----------------------
 
@@ -116,7 +117,7 @@ function getDrugInfo(intent, session, callback) {
             speechOutput = repromptText = 'Please specify a perscription for me to find info about.';
         } else {
             const results = flattenOpenFda(infoJson.body.results[0]), keys = drug_intent_map[intent.name],
-                truthy_keys = keys ? keys.filter(key => key) : [];
+                truthy_keys = keys ? keys.filter(key => results[key]) : [];
             if (truthy_keys.length) {
                 speechOutput = drugName + ": ";
                 truthy_keys.forEach(key => speechOutput += (results[key] ? results[key] : '') + '. ');
@@ -126,6 +127,18 @@ function getDrugInfo(intent, session, callback) {
         }
         callback({}, buildSpeechletResponse(intent.name, speechOutput, repromptText, false));
     });
+}
+
+function setReminder(intent, session, callback) {
+    const drugName = intent.slots.DrugName ? intent.slots.DrugName.value : null;
+    let speechOutput, repromptText;
+    if (!drugName || drugName == '') {
+        speechOutput = 'Sorry, I didn\'t catch that. Would you mind repeating that?';
+        repromptText = 'Please specify a perscription for me to find info about.';
+    } else {
+        speechOutput = `Setting a text reminder for your ${drugName} perscription.`;
+    }
+    callback({}, buildSpeechletResponse(intent.name, speechOutput, repromptText, false));
 }
 
 // --------------- Events -----------------------
@@ -167,6 +180,9 @@ function onIntent(intentRequest, session, callback) {
     case 'DrugConflictsIntent':
     case 'DrugQuestionsIntent':
         getDrugInfo(intent, session, callback);
+        break;
+    case 'SetReminderIntent':
+        setReminder(intent, session, callback);
         break;
     case 'AMAZON.HelpIntent':
         getWelcomeResponse(callback);
