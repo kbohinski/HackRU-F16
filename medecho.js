@@ -7,12 +7,12 @@ var unirest = require('unirest');
 
 var AUTH = {
     "twilio": {
-        "key": "***REMOVED***",
-        "secret": "***REMOVED***",
+        "key": "key",
+        "secret": "key",
         "number": "+18569246200"
     }
 };
-var PHONE_NUMBER = '***REMOVED***';
+var PHONE_NUMBER = 'key';
 
 // --------------- Twilio functions -----------------------
 
