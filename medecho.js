@@ -1,12 +1,50 @@
 'use strict';
 
-// --------------- OpenFDA includes -----------------------
-
 var https = require('https');
+
+// --------------- Twilio  includes -----------------------
+
+var AUTH = {
+    "twilio": {
+        "key": "***REMOVED***",
+        "secret": "***REMOVED***",
+        "number": "+18569246200"
+    }
+};
+
+// --------------- Twilio functions -----------------------
+
+function sendMessage(to, msg) {
+    var opts = {
+        'hostname': 'https://api.twilio.com/2010-04-01/Accounts/' + AUTH.twilio.key + '/Messages.json',
+        'port': 443,
+        'method': 'GET'
+    };
+
+    var headers = {
+        'To': PHONE_NUMBER,
+	'From': AUTH.twilio.number,
+	'Body': msg
+    };
+
+    var auth = {
+        'user:password': AUTH.twilio.key + ':' + AUTH.twilio.secret;
+    };
+
+    opts.auth = auth;
+    opts.headers = headers;
+
+    var req = https.request(opts, res => {
+        
+    });
+    req.end();
+};
+
+// --------------- OpenFDA includes -----------------------
 
 var BASE_URL_LABEL = 'https://api.fda.gov/drug/label.json';
 var BASE_URL_EVENT = 'https://api.fda.gov/drug/event.json';
-var PHONE_NUMBER = '';
+var PHONE_NUMBER = '***REMOVED***';
 
 // --------------- OpenFDA functions -----------------------
 
@@ -26,9 +64,9 @@ function httpRequest(url, callback) {
         res.setEncoding('utf8');
         let body = '';
         res.on('data', chunk => body += chunk);
-        res.on('end', () => callback({'status': 'success', 'body': JSON.parse(body)}));
+        res.on('end', () => callback({ 'status': 'success', 'body': JSON.parse(body) }));
     }).on('error', e => {
-        callback({'status': 'failure', 'error': e});
+        callback({ 'status': 'failure', 'error': e });
     });
 }
 
@@ -39,7 +77,7 @@ function getDrugLabel(drugName, callback) {
 function getDrugEvent(drug, callback) {
     return httpRequest(BASE_URL_EVENT + '?search=' + drug, callback);
 }
-  
+
 // --------------- Helpers that build all of the responses -----------------------
 
 function buildSpeechletResponse(title, output, repromptText, shouldEndSession) {
@@ -137,6 +175,7 @@ function setReminder(intent, session, callback) {
         repromptText = 'Please specify a perscription for me to find info about.';
     } else {
         speechOutput = `Setting a text reminder for your ${drugName} perscription.`;
+        sendMessage(PHONE_NUMBER, 'Hi, Alexa here reminding you to take your ' + drugName + ".");
     }
     callback({}, buildSpeechletResponse(intent.name, speechOutput, repromptText, false));
 }
@@ -171,28 +210,28 @@ function onIntent(intentRequest, session, callback) {
 
     // Dispatch to your skill's intent handlers
     switch (intentName) {
-    case 'DrugInfoIntent':
-    case 'DrugUsageIntent':
-    case 'DrugManufacturerIntent':
-    case 'DrugSideEffectsIntent':
-    case 'DrugActiveIngredientsIntent':
-    case 'DrugInactiveIngredientsIntent':
-    case 'DrugConflictsIntent':
-    case 'DrugQuestionsIntent':
-        getDrugInfo(intent, session, callback);
-        break;
-    case 'SetReminderIntent':
-        setReminder(intent, session, callback);
-        break;
-    case 'AMAZON.HelpIntent':
-        getWelcomeResponse(callback);
-        break;
-    case 'AMAZON.StopIntent': // Fall through
-    case 'AMAZON.CancelIntent':
-        handleSessionEndRequest(callback);
-        break;
-    default:
-        throw new Error('Invalid intent');
+        case 'DrugInfoIntent':
+        case 'DrugUsageIntent':
+        case 'DrugManufacturerIntent':
+        case 'DrugSideEffectsIntent':
+        case 'DrugActiveIngredientsIntent':
+        case 'DrugInactiveIngredientsIntent':
+        case 'DrugConflictsIntent':
+        case 'DrugQuestionsIntent':
+            getDrugInfo(intent, session, callback);
+            break;
+        case 'SetReminderIntent':
+            setReminder(intent, session, callback);
+            break;
+        case 'AMAZON.HelpIntent':
+            getWelcomeResponse(callback);
+            break;
+        case 'AMAZON.StopIntent': // Fall through
+        case 'AMAZON.CancelIntent':
+            handleSessionEndRequest(callback);
+            break;
+        default:
+            throw new Error('Invalid intent');
     }
 }
 
@@ -218,20 +257,20 @@ exports.handler = (event, context, callback) => {
             onSessionStarted({ requestId: event.request.requestId }, event.session);
 
         switch (event.request.type) {
-        case 'LaunchRequest':
-            onLaunch(event.request, event.session, (sessionAttributes, speechletResponse) => {
-                callback(null, buildResponse(sessionAttributes, speechletResponse));
-            });
-            break;
-        case 'IntentRequest':
-            onIntent(event.request, event.session, (sessionAttributes, speechletResponse) => {
-                callback(null, buildResponse(sessionAttributes, speechletResponse));
-            });
-            break;
-        case 'SessionEndedRequest':
-            onSessionEnded(event.request, event.session);
-            callback();
-            break;
+            case 'LaunchRequest':
+                onLaunch(event.request, event.session, (sessionAttributes, speechletResponse) => {
+                    callback(null, buildResponse(sessionAttributes, speechletResponse));
+                });
+                break;
+            case 'IntentRequest':
+                onIntent(event.request, event.session, (sessionAttributes, speechletResponse) => {
+                    callback(null, buildResponse(sessionAttributes, speechletResponse));
+                });
+                break;
+            case 'SessionEndedRequest':
+                onSessionEnded(event.request, event.session);
+                callback();
+                break;
         }
     } catch (err) {
         callback(err);

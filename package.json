@@ -1,5 +1,5 @@
 {
-  "name": "RxEcho",
+  "name": "Medecho",
   "version": "1.0.0",
   "description": "HackRU F16",
   "repository": {
@@ -10,11 +10,10 @@
     "url": "https://github.com/kbohinski/HackRU-F16/issues"
   },
   "scripts": {
-    "start": "node app.js"
+    "start": "node medecho.js"
   },
-  "main": "app.js",
+  "main": "medecho.js",
   "dependencies": {
-    "sync-request": "^3.0.1",
     "twilio": "^2.11.0"
   }
 }
