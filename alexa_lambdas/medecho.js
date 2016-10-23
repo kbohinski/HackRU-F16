@@ -7,6 +7,17 @@ var https = require('https');
 var BASE_URL_LABEL = 'https://api.fda.gov/drug/label.json';
 var BASE_URL_EVENT = 'https://api.fda.gov/drug/event.json';
 
+var drug_intent_map = {
+    'DrugInfoIntent': ['purpose', 'indications_and_usage'],
+    'DrugUsageIntent': ['dosage_and_administration'],
+    'DrugManufacturerIntent': ['manufacturer_name'],
+    'DrugSideEffectsIntent': ['stop_use', 'warnings'],
+    'DrugActiveIngredientsIntent': ['active_ingredient'],
+    'DrugInactiveIngredientsIntent': ['inactive_ingredient'],
+    'DrugConflictsIntent': ['do_not_use'],
+    'DrugQuestionsIntent': ['questions'],
+}
+
 function httpRequest(url, callback) {
     https.get(url, res => {
         res.setEncoding('utf8');
@@ -18,7 +29,7 @@ function httpRequest(url, callback) {
     });
 }
 
-function getDrugLabel(drugName, infoType, callback) {
+function getDrugLabel(drugName, callback) {
     return httpRequest(BASE_URL_LABEL + '?search=' + drugName, callback);
 }
 
@@ -64,9 +75,9 @@ function getWelcomeResponse(callback) {
     // If we wanted to initialize the session to have some attributes we could add those here.
     const sessionAttributes = {};
     const cardTitle = 'Welcome';
-    const speechOutput = 'Welcome to Medecho. ' +
+    const speechOutput = 'Welcome to Medecho. ' /*+
         'I can answer any questions you may have regarding medication usage and safety information. ' + 
-        'I can also set daily reminders for your perscriptions.';
+        'I can also set daily reminders for your perscriptions.'*/;
     // If the user either does not reply to the welcome message or says something that is not
     // understood, they will be prompted again with this text.
     const repromptText = 'Feel free to ask information regarding a perscription.'
@@ -94,44 +105,25 @@ function flattenOpenFda(json) {
 }
 
 function getDrugInfo(intent, session, callback) {
-    const drugName = intent.slots.DrugName ? intent.slots.DrugName.value : null,
-        infoType = intent.slots.InfoType ? intent.slots.InfoType.value : 'GENERAL';
+    const drugName = intent.slots.DrugName ? intent.slots.DrugName.value : null;
     let speechOutput, repromptText;
 
-    getDrugLabel(drugName, infoType, infoJson => {
-        if (!drugName || infoJson.status === 'failure') {
-            repromptText = 'Please specify a perscription for me to find info about.';
+    getDrugLabel(drugName, infoJson => {
+        if (!drugName || drugName == '' || infoJson.status === 'failure' || infoJson.body.error) {
+            speechOutput = drugName + ' ';
+            speechOutput = repromptText = 'Please specify a perscription for me to find info about.';
         } else {
-            speechOutput = drugName + ": ";
-            const results = flattenOpenFda(infoJson.body.results[0]), keys = (() => {
-                switch (infoType) {
-                case 'GENERAL':
-                    return ['purpose', 'indications_and_usage'];
-                case 'USAGE_INSTRUCTIONS':
-                    return ['dosage_and_administration'];
-                case 'MANUFACTURER':
-                    return ['manufacturer_name'];
-                case 'SIDE_EFFECTS':
-                    return ['stop_use'];
-                case 'ACTIVE_INGREDIENTS':
-                    return ['active_ingredient'];
-                case 'INACTIVE_INGREDIENTS':
-                    return ['inactive_ingredient'];
-                case 'CONFLICTS':
-                    return ['do_not_use'];
-                default:
-                    return [];
-                }
-            })();
-            if (keys.length)
-                keys.forEach(key => speechOutput += results[key] + '. ');
-            else
-                repromptText = 'I wasn\'t able to find any information about that on record.';
+            const results = flattenOpenFda(infoJson.body.results[0]), keys = drug_intent_map[intent.name];
+            if (keys && keys.length) {
+                speechOutput = drugName + ": ";
+                keys.forEach(key => speechOutput += (results[key] ? results[key] : '') + '. ');
+            } else {
+                speechOutput = repromptText = 'I wasn\'t able to find any information about that on record.';
+            }
         }
         callback({}, buildSpeechletResponse(intent.name, speechOutput, repromptText, false));
     });
 }
-
 
 // --------------- Events -----------------------
 
@@ -164,6 +156,13 @@ function onIntent(intentRequest, session, callback) {
     // Dispatch to your skill's intent handlers
     switch (intentName) {
     case 'DrugInfoIntent':
+    case 'DrugUsageIntent':
+    case 'DrugManufacturerIntent':
+    case 'DrugSideEffectsIntent':
+    case 'DrugActiveIngredientsIntent':
+    case 'DrugInactiveIngredientsIntent':
+    case 'DrugConflictsIntent':
+    case 'DrugQuestionsIntent':
         getDrugInfo(intent, session, callback);
         break;
     case 'AMAZON.HelpIntent':
@@ -219,75 +218,3 @@ exports.handler = (event, context, callback) => {
         callback(err);
     }
 };
-
-/*
-
--- Demo code for reference --
-
-/**
- * This sample demonstrates a simple skill built with the Amazon Alexa Skills Kit.
- * The Intent Schema, Custom Slots, and Sample Utterances for this skill, as well as
- * testing instructions are located at http://amzn.to/1LzFrj6
- *
- * For additional samples, visit the Alexa Skills Kit Getting Started guide at
- * http://amzn.to/1LGWsLG
- *
-
-function createFavoriteColorAttributes(favoriteColor) {
-    return {
-        favoriteColor,
-    };
-}
-
-/**
- * Sets the color in the session and prepares the speech to reply to the user.
- *
-function setColorInSession(intent, session, callback) {
-    const cardTitle = intent.name;
-    const favoriteColorSlot = intent.slots.Color;
-    let repromptText = '';
-    let sessionAttributes = {};
-    const shouldEndSession = false;
-    let speechOutput = '';
-
-    if (favoriteColorSlot) {
-        const favoriteColor = favoriteColorSlot.value;
-        sessionAttributes = createFavoriteColorAttributes(favoriteColor);
-        speechOutput = `I now know your favorite color is ${favoriteColor}. You can ask me ` +
-            "your favorite color by saying, what's my favorite color?";
-        repromptText = "You can ask me your favorite color by saying, what's my favorite color?";
-    } else {
-        speechOutput = "I'm not sure what your favorite color is. Please try again.";
-        repromptText = "I'm not sure what your favorite color is. You can tell me your " +
-            'favorite color by saying, my favorite color is red';
-    }
-
-    callback(sessionAttributes,
-         buildSpeechletResponse(cardTitle, speechOutput, repromptText, shouldEndSession));
-}
-
-function getColorFromSession(intent, session, callback) {
-    let favoriteColor;
-    const repromptText = null;
-    const sessionAttributes = {};
-    let shouldEndSession = false;
-    let speechOutput = '';
-
-    if (session.attributes) {
-        favoriteColor = session.attributes.favoriteColor;
-    }
-
-    if (favoriteColor) {
-        speechOutput = `Your favorite color is ${favoriteColor}. Goodbye.`;
-        shouldEndSession = true;
-    } else {
-        speechOutput = "I'm not sure what your favorite color is, you can say, my favorite color " +
-            ' is red';
-    }
-
-    // Setting repromptText to null signifies that we do not want to reprompt the user.
-    // If the user does not respond or says something that is not understood, the session
-    // will end.
-    callback(sessionAttributes,
-         buildSpeechletResponse(intent.name, speechOutput, repromptText, shouldEndSession));
-}*/
