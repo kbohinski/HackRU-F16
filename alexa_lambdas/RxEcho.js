@@ -2,25 +2,28 @@
 
 // --------------- OpenFDA functions -----------------------
 
-var http = require('http');
+var https = require('https');
 
-var BASE_URL_LABEL = 'http://api.fda.gov/drug/label.json';
-var BASE_URL_EVENT = 'http://api.fda.gov/drug/event.json';
+var BASE_URL_LABEL = 'https://api.fda.gov/drug/label.json';
+var BASE_URL_EVENT = 'https://api.fda.gov/drug/event.json';
 
-function xhrRequest(url, callback) {
-    http.get(url, res => {
-        callback({'status': 'success', 'body': res.body});
+function httpRequest(url, callback) {
+    https.get(url, res => {
+        var body = '';
+        res.setEncoding('utf8');
+        res.on('data', chunk => body += chunk);
+        callback({'status': 'success', 'body': body});
     }).on('error', e => {
         callback({'status': 'failure', 'error': e});
     });
 }
 
 function getDrugLabel(drugName, infoType, callback) {
-    return xhrRequest(BASE_URL_LABEL + '?search=' + drugName, callback);
+    return httpRequest(BASE_URL_LABEL + '?search=' + drugName, callback);
 }
 
 function getDrugEvent(drug, callback) {
-    return xhrRequest(BASE_URL_EVENT + '?search=' + drug, callback);
+    return httpRequest(BASE_URL_EVENT + '?search=' + drug, callback);
 }
   
 // --------------- Helpers that build all of the responses -----------------------
@@ -96,9 +99,10 @@ function getDrugInfo(intent, session, callback) {
         if (!drugName || infoJson.status === 'failure') {
             repromptText = 'Please specify a perscription for me to find info about.';
         } else {
+            speechOutput = drugName + ": ";
             switch (intent.slots.InfoType.value) {
             case 'GENERAL':
-                speechOutput = 'General perscription information.';
+                speechOutput += infoJson.purpose + ". " + infoJson.indications_and_usage;
                 break;
             case 'PERSCRIPTION_REQUIRED':
                 speechOutput = 'No perscription required.';
@@ -123,7 +127,6 @@ function getDrugInfo(intent, session, callback) {
                 repromptText = 'I wasn\'t able to find any information about that on record.';
                 break;
             }
-            speechOutput = infoJson.body;
         }
         callback({}, buildSpeechletResponse(intent.name, speechOutput, repromptText, false));
     });
