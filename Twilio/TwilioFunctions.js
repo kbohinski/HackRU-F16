@@ -9,8 +9,8 @@ var exports.sendMessage = function(to, msg) {
     body: msg
   }, function(err, res) {
     if (err) {
-      return {"status": "success", "error": err};
+      return {"status": "failure", "error": err};
     }
-    return {"status": "failure"};
+    return {"status": "success"};
   });
 };

@@ -14,5 +14,7 @@
   },
   "main": "app.js",
   "dependencies": {
+    "sync-request": "^3.0.1",
+    "twilio": "^2.11.0"
   }
 }
