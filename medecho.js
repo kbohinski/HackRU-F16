@@ -2,23 +2,23 @@
 
 var https = require('https');
 var unirest = require('unirest');
+var keys = require('./secret-keys.js');
 
 // --------------- Twilio  includes -----------------------
 
 var AUTH = {
     "twilio": {
-        "key": "key",
-        "secret": "key",
-        "number": "+18569246200"
+        "key": keys.TWILIO_KEY,
+        "secret": keys.TWILIO_SECRET_KEY,
+        "number": keys.TWILIO_CALL_NUMBER
     }
 };
-var PHONE_NUMBER = 'key';
 
 // --------------- Twilio functions -----------------------
 
 function sendMessage(to, msg) {
     var headers = {
-        'To': PHONE_NUMBER,
+        'To': keys.TWILIO_CALL_NUMBER,
     	'From': AUTH.twilio['number'],
 	    'Body': msg
     };

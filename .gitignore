@@ -1,3 +1,5 @@
 node_modules/
 Twilio/TwilioCreds.json
 *.zip
+secret-keys.js
+publish.sh
